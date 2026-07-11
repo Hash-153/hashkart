@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Heart, Star, ShoppingCart } from 'lucide-react';
 import { Product } from '../types';
 import { useCart } from '../context/CartContext';
+import { useToast } from './ui/Toast';
 import { api } from '../services/api';
 
 interface ProductCardProps {
@@ -12,7 +13,10 @@ interface ProductCardProps {
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product, onWishlistToggle }) => {
   const { addToCart } = useCart();
+  const { showToast } = useToast();
   const navigate = useNavigate();
+  const [isWishlisted, setIsWishlisted] = useState<boolean>(false);
+  const [isAddingWishlist, setIsAddingWishlist] = useState<boolean>(false);
 
   const primaryVariant = product.variants && product.variants.length > 0 ? product.variants[0] : null;
   const primaryImage =
@@ -36,9 +40,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onWishlistTog
     if (primaryVariant && !isOutOfStock) {
       try {
         await addToCart(primaryVariant.id, 1);
+        showToast('success', 'Added to Cart', `${product.name} added to your basket.`);
         navigate('/cart');
       } catch (err: any) {
-        alert(err.message || 'Error adding to cart');
+        showToast('error', 'Error', err.message || 'Error adding item to cart.');
       }
     }
   };
@@ -46,14 +51,18 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onWishlistTog
   const handleToggleWishlist = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (primaryVariant) {
-      try {
-        await api.addToWishlist(primaryVariant.id);
-        if (onWishlistToggle) onWishlistToggle();
-        alert('Added item to Wishlist!');
-      } catch (err: any) {
-        alert(err.message || 'Please login to save items to wishlist.');
-      }
+    if (!primaryVariant || isAddingWishlist) return;
+
+    setIsAddingWishlist(true);
+    try {
+      await api.addToWishlist(primaryVariant.id);
+      setIsWishlisted(!isWishlisted);
+      if (onWishlistToggle) onWishlistToggle();
+      showToast('success', 'Wishlist Updated', `${product.name} saved to your wishlist.`);
+    } catch (err: any) {
+      showToast('error', 'Wishlist Error', err.message || 'Unable to update wishlist.');
+    } finally {
+      setIsAddingWishlist(false);
     }
   };
 
@@ -62,10 +71,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onWishlistTog
       <button
         className="wishlist-icon-btn"
         onClick={handleToggleWishlist}
-        title="Add to Wishlist"
+        title={isWishlisted ? 'Saved in Wishlist' : 'Add to Wishlist'}
         aria-label="Add to Wishlist"
+        style={{
+          transition: 'transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+        }}
       >
-        <Heart size={20} />
+        <Heart
+          size={20}
+          fill={isWishlisted ? '#ff4343' : 'transparent'}
+          color={isWishlisted ? '#ff4343' : '#878787'}
+        />
       </button>
 
       <Link to={`/products/${product.slug || product.id}`}>

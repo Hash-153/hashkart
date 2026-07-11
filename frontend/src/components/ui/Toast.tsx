@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { CheckCircle2, AlertCircle, Info, AlertTriangle, X } from 'lucide-react';
 
-export type ToastType = 'success' | 'error' | 'info' | 'warning';
+export type ToastType = 'success' | 'error' | 'info' | 'warning' | 'danger';
 
 export interface ToastMessage {
   id: string;
@@ -44,6 +44,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       case 'success':
         return <CheckCircle2 size={20} className="toast-icon-success" />;
       case 'error':
+      case 'danger':
         return <AlertCircle size={20} className="toast-icon-error" />;
       case 'warning':
         return <AlertTriangle size={20} className="toast-icon-warning" />;

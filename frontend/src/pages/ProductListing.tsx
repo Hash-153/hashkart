@@ -117,6 +117,7 @@ export const ProductListing: React.FC = () => {
       <FilterSidebar
         categories={categories}
         brands={brands}
+        facets={facets}
         selectedCategoryId={queryCategory}
         selectedBrandId={queryBrand}
         selectedMinRating={queryRating}

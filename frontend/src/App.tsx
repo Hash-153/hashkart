@@ -45,6 +45,8 @@ import { AdminCategoryManagementPage } from './pages/admin/AdminCategoryManageme
 import { AdminAuditLogsPage } from './pages/admin/AdminAuditLogsPage';
 import { AdminABTestingPage } from './pages/admin/AdminABTestingPage';
 import { AdminTaxReportingPage } from './pages/admin/AdminTaxReportingPage';
+import { StaticInfoPage } from './pages/StaticInfoPage';
+import { ScrollToTop } from './components/ScrollToTop';
 
 export const App: React.FC = () => {
   return (
@@ -52,6 +54,7 @@ export const App: React.FC = () => {
       <CartProvider>
         <ToastProvider>
           <Router>
+            <ScrollToTop />
             <div className="app-container">
               <Navbar />
               <main className="main-content">
@@ -71,6 +74,15 @@ export const App: React.FC = () => {
                   <Route path="/forgot-password" element={<ForgotPassword />} />
                   <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/wishlist" element={<WishlistPage />} />
+
+                  {/* Static Info & Footer Pages */}
+                  <Route path="/info/:pageKey" element={<StaticInfoPage />} />
+                  <Route path="/info" element={<Navigate to="/info/about-us" replace />} />
+                  <Route path="/about" element={<Navigate to="/info/about-us" replace />} />
+                  <Route path="/contact" element={<Navigate to="/info/contact-us" replace />} />
+                  <Route path="/faq" element={<Navigate to="/info/faq" replace />} />
+                  <Route path="/terms" element={<Navigate to="/info/terms" replace />} />
+                  <Route path="/privacy" element={<Navigate to="/info/privacy" replace />} />
 
                   <Route
                     path="/support"

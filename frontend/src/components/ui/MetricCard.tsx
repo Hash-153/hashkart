@@ -7,7 +7,7 @@ export interface MetricCardProps {
   subtitle?: string;
   trendPercentage?: number;
   icon?: React.ReactNode;
-  variant?: 'blue' | 'green' | 'purple' | 'amber' | 'neutral';
+  variant?: 'blue' | 'green' | 'purple' | 'amber' | 'neutral' | 'danger' | 'red';
 }
 
 export const MetricCard: React.FC<MetricCardProps> = ({

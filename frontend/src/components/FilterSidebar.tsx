@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Category, Brand } from '../types';
+import { Category, Brand, SearchFacets } from '../types';
 import { Filter, Star } from 'lucide-react';
 
 interface FilterSidebarProps {
   categories: Category[];
   brands: Brand[];
+  facets?: SearchFacets;
   selectedCategoryId?: number;
   selectedBrandId?: number;
   selectedMinRating?: number;
@@ -23,6 +24,7 @@ interface FilterSidebarProps {
 export const FilterSidebar: React.FC<FilterSidebarProps> = ({
   categories,
   brands,
+  facets,
   selectedCategoryId,
   selectedBrandId,
   selectedMinRating,
@@ -43,6 +45,79 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
       max_price: maxP ? Number(maxP) : undefined,
     });
   };
+
+  const handleCategoryClick = (catId: number) => {
+    if (selectedCategoryId === catId) {
+      // Toggle off
+      onFilterChange({
+        category_id: undefined,
+        brand_id: selectedBrandId,
+        min_rating: selectedMinRating,
+        min_price: selectedMinPrice,
+        max_price: selectedMaxPrice,
+      });
+    } else {
+      // Select new category
+      onFilterChange({
+        category_id: catId,
+        brand_id: selectedBrandId,
+        min_rating: selectedMinRating,
+        min_price: selectedMinPrice,
+        max_price: selectedMaxPrice,
+      });
+    }
+  };
+
+  const handleBrandClick = (brandId: number) => {
+    if (selectedBrandId === brandId) {
+      // Toggle off
+      onFilterChange({
+        category_id: selectedCategoryId,
+        brand_id: undefined,
+        min_rating: selectedMinRating,
+        min_price: selectedMinPrice,
+        max_price: selectedMaxPrice,
+      });
+    } else {
+      // Select new brand
+      onFilterChange({
+        category_id: selectedCategoryId,
+        brand_id: brandId,
+        min_rating: selectedMinRating,
+        min_price: selectedMinPrice,
+        max_price: selectedMaxPrice,
+      });
+    }
+  };
+
+  const handleRatingClick = (stars: number) => {
+    if (selectedMinRating === stars) {
+      // Toggle off
+      onFilterChange({
+        category_id: selectedCategoryId,
+        brand_id: selectedBrandId,
+        min_rating: undefined,
+        min_price: selectedMinPrice,
+        max_price: selectedMaxPrice,
+      });
+    } else {
+      onFilterChange({
+        category_id: selectedCategoryId,
+        brand_id: selectedBrandId,
+        min_rating: stars,
+        min_price: selectedMinPrice,
+        max_price: selectedMaxPrice,
+      });
+    }
+  };
+
+  // Build facet lookup map for fast brand counts
+  const facetBrandCountMap = new Map<number, number>();
+  if (facets?.brands) {
+    facets.brands.forEach((fb) => {
+      facetBrandCountMap.set(fb.id, fb.count);
+    });
+  }
 
   return (
     <aside
@@ -104,7 +179,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
           onClick={handlePriceApply}
           style={{
             width: '100%',
-            padding: '4px',
+            padding: '6px',
             fontSize: '12px',
             backgroundColor: '#2874f0',
             color: '#fff',
@@ -122,72 +197,78 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
       <div style={{ marginBottom: '20px' }}>
         <h4 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '10px' }}>Categories</h4>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '200px', overflowY: 'auto' }}>
-          {categories.map((c) => (
-            <label
-              key={c.id}
-              style={{
-                fontSize: '13px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                color: selectedCategoryId === c.id ? 'var(--primary-2874f0)' : 'var(--text-main)',
-                fontWeight: selectedCategoryId === c.id ? 700 : 400,
-              }}
-            >
-              <input
-                type="radio"
-                name="category"
-                checked={selectedCategoryId === c.id}
-                onChange={() =>
-                  onFilterChange({
-                    category_id: c.id,
-                    brand_id: selectedBrandId,
-                    min_rating: selectedMinRating,
-                    min_price: selectedMinPrice,
-                    max_price: selectedMaxPrice,
-                  })
-                }
-              />
-              {c.name}
-            </label>
-          ))}
+          {categories.map((c) => {
+            const isSelected = selectedCategoryId === c.id;
+            return (
+              <label
+                key={c.id}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleCategoryClick(c.id);
+                }}
+                style={{
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  color: isSelected ? 'var(--primary-2874f0)' : 'var(--text-main)',
+                  fontWeight: isSelected ? 700 : 400,
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={isSelected}
+                  readOnly
+                  style={{ cursor: 'pointer' }}
+                />
+                {c.name}
+              </label>
+            );
+          })}
         </div>
       </div>
 
       {/* Brand Filter */}
       <div style={{ marginBottom: '20px' }}>
         <h4 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '10px' }}>Brands</h4>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '200px', overflowY: 'auto' }}>
-          {brands.map((b) => (
-            <label
-              key={b.id}
-              style={{
-                fontSize: '13px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                color: selectedBrandId === b.id ? 'var(--primary-2874f0)' : 'var(--text-main)',
-              }}
-            >
-              <input
-                type="radio"
-                name="brand"
-                checked={selectedBrandId === b.id}
-                onChange={() =>
-                  onFilterChange({
-                    category_id: selectedCategoryId,
-                    brand_id: b.id,
-                    min_rating: selectedMinRating,
-                    min_price: selectedMinPrice,
-                    max_price: selectedMaxPrice,
-                  })
-                }
-              />
-              {b.name}
-            </label>
-          ))}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '220px', overflowY: 'auto' }}>
+          {brands.map((b) => {
+            const isSelected = selectedBrandId === b.id;
+            const count = facetBrandCountMap.has(b.id) ? facetBrandCountMap.get(b.id) : b.product_count;
+            return (
+              <label
+                key={b.id}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleBrandClick(b.id);
+                }}
+                style={{
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '8px',
+                  color: isSelected ? 'var(--primary-2874f0)' : 'var(--text-main)',
+                  fontWeight: isSelected ? 700 : 400,
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <input
+                    type="checkbox"
+                    checked={isSelected}
+                    readOnly
+                    style={{ cursor: 'pointer' }}
+                  />
+                  <span>{b.name}</span>
+                </div>
+                {count !== undefined && (
+                  <span style={{ fontSize: '11px', color: '#888', fontWeight: 400 }}>({count})</span>
+                )}
+              </label>
+            );
+          })}
         </div>
       </div>
 
@@ -195,36 +276,37 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
       <div>
         <h4 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '10px' }}>Customer Ratings</h4>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {[4, 3, 2, 1].map((stars) => (
-            <label
-              key={stars}
-              style={{
-                fontSize: '13px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-              }}
-            >
-              <input
-                type="radio"
-                name="rating"
-                checked={selectedMinRating === stars}
-                onChange={() =>
-                  onFilterChange({
-                    category_id: selectedCategoryId,
-                    brand_id: selectedBrandId,
-                    min_rating: stars,
-                    min_price: selectedMinPrice,
-                    max_price: selectedMaxPrice,
-                  })
-                }
-              />
-              <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                {stars} <Star size={12} fill="#ff9f00" color="#ff9f00" /> & above
-              </span>
-            </label>
-          ))}
+          {[4, 3, 2, 1].map((stars) => {
+            const isSelected = selectedMinRating === stars;
+            return (
+              <label
+                key={stars}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleRatingClick(stars);
+                }}
+                style={{
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  color: isSelected ? 'var(--primary-2874f0)' : 'var(--text-main)',
+                  fontWeight: isSelected ? 700 : 400,
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={isSelected}
+                  readOnly
+                  style={{ cursor: 'pointer' }}
+                />
+                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  {stars} <Star size={12} fill="#ff9f00" color="#ff9f00" /> & above
+                </span>
+              </label>
+            );
+          })}
         </div>
       </div>
     </aside>

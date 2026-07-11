@@ -29,6 +29,7 @@ from app.api.v1.endpoints import (
     users,
     warehouse,
     webhooks,
+    wishlist,
 )
 
 api_router = APIRouter()
@@ -40,7 +41,7 @@ api_router.include_router(catalog.router, prefix="/catalog", tags=["Catalog"])
 api_router.include_router(search.router, prefix="/search", tags=["Search Subsystem"])
 api_router.include_router(discovery.router, prefix="/discovery", tags=["Discovery & Recommendations"])
 api_router.include_router(cart.router, prefix="/cart", tags=["Shopping Cart"])
-api_router.include_router(wishlist_router := cart.router, prefix="/cart-extra", tags=["Shopping Cart Extra"])
+api_router.include_router(wishlist.router, prefix="/wishlist", tags=["Wishlist"])
 api_router.include_router(checkout.router, prefix="/checkout", tags=["Checkout"])
 api_router.include_router(orders.router, prefix="/orders", tags=["Orders"])
 api_router.include_router(reviews.router, prefix="/reviews", tags=["Reviews"])

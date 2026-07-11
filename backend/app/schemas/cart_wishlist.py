@@ -64,5 +64,6 @@ class WishlistResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
-    user_id: int
+    user_id: Optional[int] = None
+    session_id: Optional[str] = None
     items: List[WishlistItemResponse] = []

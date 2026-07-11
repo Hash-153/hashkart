@@ -48,12 +48,13 @@ class Wishlist(Base):
     __tablename__ = "wishlists"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    user_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    user_id: Mapped[Optional[int]] = mapped_column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=True, index=True
     )
+    session_id: Mapped[Optional[str]] = mapped_column(String(100), nullable=True, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
 
-    user: Mapped["User"] = relationship("User", back_populates="wishlist")
+    user: Mapped[Optional["User"]] = relationship("User", back_populates="wishlist")
     items: Mapped[List["WishlistItem"]] = relationship(
         "WishlistItem", back_populates="wishlist", cascade="all, delete-orphan", lazy="selectin"
     )
