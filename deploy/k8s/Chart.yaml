@@ -1,0 +1,26 @@
+apiVersion: v2
+name: novamart-marketplace
+description: Enterprise High-Availability Kubernetes Helm Chart for NovaMart E-Commerce Platform
+type: application
+version: 2.5.0
+appVersion: "2.5.0"
+maintainers:
+  - name: NovaMart Infrastructure & Platform SRE Team
+    email: sre-team@novamart.in
+keywords:
+  - ecommerce
+  - marketplace
+  - fastapi
+  - react
+  - redis
+  - postgresql
+  - celery
+dependencies:
+  - name: postgresql
+    version: 15.5.0
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.enabled
+  - name: redis
+    version: 19.6.0
+    repository: https://charts.bitnami.com/bitnami
+    condition: redis.enabled

@@ -1,0 +1,50 @@
+name: Automated Performance & Load Testing
+
+on:
+  workflow_dispatch:
+    inputs:
+      concurrent_users:
+        description: 'Number of concurrent virtual shoppers'
+        required: true
+        default: '5000'
+      spawn_rate:
+        description: 'Users spawned per second'
+        required: true
+        default: '200'
+      run_time:
+        description: 'Duration of load test (e.g. 10m)'
+        required: true
+        default: '10m'
+
+jobs:
+  locust-load-test:
+    name: Execute Distributed Locust Stress Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Locust
+        run: pip install locust
+
+      - name: Run Headless Locust Load Test
+        run: |
+          locust -f scripts/load_test_locust.py \
+            --headless \
+            -u ${{ github.event.inputs.concurrent_users }} \
+            -r ${{ github.event.inputs.spawn_rate }} \
+            --run-time ${{ github.event.inputs.run_time }} \
+            --host https://staging.novamart.in \
+            --html load-test-report.html
+
+      - name: Upload HTML Load Test Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: locust-load-test-report
+          path: load-test-report.html

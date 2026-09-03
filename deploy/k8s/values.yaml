@@ -1,0 +1,160 @@
+global:
+  environment: production
+  domain: novamart.in
+  region: ap-south-1
+  imageRegistry: "602401143452.dkr.ecr.ap-south-1.amazonaws.com/novamart"
+  imagePullPolicy: IfNotPresent
+
+backend:
+  replicaCount: 8
+  image:
+    repository: backend
+    tag: "2.5.0"
+  service:
+    type: ClusterIP
+    port: 8000
+    targetPort: 8000
+  resources:
+    limits:
+      cpu: "2000m"
+      memory: "4096Mi"
+    requests:
+      cpu: "500m"
+      memory: "1024Mi"
+  autoscaling:
+    enabled: true
+    minReplicas: 8
+    maxReplicas: 48
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 75
+  env:
+    APP_ENV: "production"
+    LOG_LEVEL: "INFO"
+    CORS_ORIGINS: "https://novamart.in,https://www.novamart.in,https://seller.novamart.in,https://admin.novamart.in"
+    ACCESS_TOKEN_EXPIRE_MINUTES: "1440"
+    RATE_LIMIT_BURST: "300"
+    RATE_LIMIT_RATE: "100"
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: 8000
+    initialDelaySeconds: 15
+    periodSeconds: 10
+    timeoutSeconds: 3
+    failureThreshold: 3
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: 8000
+    initialDelaySeconds: 10
+    periodSeconds: 5
+    timeoutSeconds: 2
+    failureThreshold: 2
+
+frontend:
+  replicaCount: 6
+  image:
+    repository: frontend
+    tag: "2.5.0"
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 80
+  resources:
+    limits:
+      cpu: "1000m"
+      memory: "1024Mi"
+    requests:
+      cpu: "250m"
+      memory: "512Mi"
+  autoscaling:
+    enabled: true
+    minReplicas: 6
+    maxReplicas: 32
+    targetCPUUtilizationPercentage: 75
+
+celeryWorker:
+  replicaCount: 6
+  image:
+    repository: backend
+    tag: "2.5.0"
+  command: ["celery", "-A", "app.core.celery_app", "worker", "--loglevel=info", "--concurrency=8", "-Q", "orders,settlements,notifications,default"]
+  resources:
+    limits:
+      cpu: "2000m"
+      memory: "4096Mi"
+    requests:
+      cpu: "500m"
+      memory: "1024Mi"
+  autoscaling:
+    enabled: true
+    minReplicas: 6
+    maxReplicas: 24
+
+celeryBeat:
+  replicaCount: 1
+  image:
+    repository: backend
+    tag: "2.5.0"
+  command: ["celery", "-A", "app.core.celery_app", "beat", "--loglevel=info"]
+  resources:
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+    requests:
+      cpu: "100m"
+      memory: "256Mi"
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "120"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "120"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://novamart.in,https://seller.novamart.in,https://admin.novamart.in"
+    nginx.ingress.kubernetes.io/limit-rps: "150"
+    nginx.ingress.kubernetes.io/limit-burst-multiplier: "5"
+  hosts:
+    - host: novamart.in
+      paths:
+        - path: /api
+          pathType: Prefix
+          service: backend
+        - path: /metrics
+          pathType: Exact
+          service: backend
+        - path: /
+          pathType: Prefix
+          service: frontend
+  tls:
+    - secretName: novamart-tls-cert
+      hosts:
+        - novamart.in
+        - "*.novamart.in"
+
+database:
+  host: "novamart-aurora-cluster.cluster-c7k2910.ap-south-1.rds.amazonaws.com"
+  port: 5432
+  name: "novamart_db"
+  user: "novamart_app"
+  sslmode: "require"
+  poolSize: 50
+  maxOverflow: 30
+
+redis:
+  host: "novamart-valkey-clustercfg.ap-south-1.cache.amazonaws.com"
+  port: 6379
+  db: 0
+  clusterMode: true
+
+telemetry:
+  prometheus:
+    enabled: true
+    scrapeInterval: "15s"
+    path: "/metrics"
+  jaeger:
+    enabled: true
+    collectorEndpoint: "http://jaeger-collector.monitoring.svc.cluster.local:14268/api/traces"

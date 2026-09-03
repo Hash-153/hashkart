@@ -1,0 +1,77 @@
+name: NovaMart Production CD
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build-and-push:
+    name: Build & Push Container Images to Amazon ECR
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::602401143452:role/github-actions-ecr-push
+          aws-region: ap-south-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build & Push Backend Container Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          tags: |
+            ${{ steps.login-ecr.outputs.registry }}/novamart-backend:${{ github.ref_name }}
+            ${{ steps.login-ecr.outputs.registry }}/novamart-backend:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build & Push Frontend Container Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: true
+          tags: |
+            ${{ steps.login-ecr.outputs.registry }}/novamart-frontend:${{ github.ref_name }}
+            ${{ steps.login-ecr.outputs.registry }}/novamart-frontend:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy-helm:
+    name: Blue/Green Deployment via Helm
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::602401143452:role/github-actions-eks-deploy
+          aws-region: ap-south-1
+
+      - name: Update Kubeconfig
+        run: aws eks update-kubeconfig --name novamart-production --region ap-south-1
+
+      - name: Deploy Helm Release
+        run: |
+          helm upgrade --install novamart ./deploy/k8s \
+            --namespace production \
+            --create-namespace \
+            --set backend.image.tag=${{ github.ref_name }} \
+            --set frontend.image.tag=${{ github.ref_name }} \
+            --wait --timeout 10m

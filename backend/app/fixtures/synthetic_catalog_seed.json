@@ -1,0 +1,47 @@
+{
+  "version": "2.5.0",
+  "catalog_schema_version": "v2",
+  "generated_at": "2026-08-25T12:00:00Z",
+  "products": [
+    {
+      "id": 1,
+      "name": "Apple iPhone 15 Pro Max (256 GB) - Natural Titanium",
+      "slug": "apple-iphone-15-pro-max-256gb-natural-titanium",
+      "category_slug": "mobiles-tablets",
+      "brand": "Apple",
+      "hsn_code": "85171300",
+      "is_assured": true,
+      "variants": [
+        { "id": 101, "sku": "APL-IP15PM-256-NT", "title": "256 GB Natural Titanium", "price": 149900.00, "mrp": 159900.00, "stock_quantity": 45, "barcode": "8901030384486" },
+        { "id": 102, "sku": "APL-IP15PM-512-NT", "title": "512 GB Natural Titanium", "price": 169900.00, "mrp": 179900.00, "stock_quantity": 20, "barcode": "8901030384486" }
+      ],
+      "attributes": {
+        "Display": "6.7-inch Super Retina XDR OLED 120Hz ProMotion",
+        "Processor": "A17 Pro Chip 6-Core CPU",
+        "Camera": "48MP Main + 12MP Ultra Wide + 12MP 5x Telephoto",
+        "Connector": "USB-C with USB 3 Speeds (10Gbps)",
+        "Operating System": "iOS 17"
+      }
+    },
+    {
+      "id": 2,
+      "name": "Sony WH-1000XM5 ANC Wireless Headphones",
+      "slug": "sony-wh-1000xm5-anc-wireless-headphones",
+      "category_slug": "electronics-laptops",
+      "brand": "Sony",
+      "hsn_code": "85183000",
+      "is_assured": true,
+      "variants": [
+        { "id": 201, "sku": "SNY-XM5-BLK", "title": "Midnight Black", "price": 26990.00, "mrp": 34990.00, "stock_quantity": 80, "barcode": "8901030384486" },
+        { "id": 202, "sku": "SNY-XM5-SLV", "title": "Platinum Silver", "price": 26990.00, "mrp": 34990.00, "stock_quantity": 35, "barcode": "8901030384486" }
+      ],
+      "attributes": {
+        "Form Factor": "Over-Ear Wireless",
+        "Noise Cancellation": "Auto NC Optimizer with Integrated Processor V1",
+        "Battery Life": "Up to 30 Hours with Fast USB-PD Charging",
+        "Microphones": "8 Microphones with AI Noise Reduction",
+        "Bluetooth Codecs": "LDAC, AAC, SBC"
+      }
+    }
+  ]
+}

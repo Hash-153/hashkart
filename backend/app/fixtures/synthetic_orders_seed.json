@@ -1,0 +1,100 @@
+{
+  "version": "2.5.0",
+  "generated_at": "2026-08-25T12:00:00Z",
+  "orders_sample": [
+    {
+      "order_number": "HK-20260825-99A1",
+      "customer_email": "rohit.sharma@example.com",
+      "customer_name": "Rohit Sharma",
+      "shipping_address": {
+        "full_name": "Rohit Sharma",
+        "phone_number": "9876543210",
+        "address_line1": "12, 100 Feet Road, Indiranagar",
+        "city": "Bengaluru",
+        "state": "Karnataka",
+        "postal_code": "560038",
+        "country": "India"
+      },
+      "items": [
+        {
+          "product_id": 1,
+          "product_name": "Apple iPhone 15 Pro Max (256 GB)",
+          "sku": "APL-IP15PM-256",
+          "quantity": 1,
+          "unit_price": 149900.00,
+          "total_price": 149900.00,
+          "seller_id": 1,
+          "seller_name": "Official Apple Premium Reseller"
+        }
+      ],
+      "payment": {
+        "gateway": "RAZORPAY",
+        "transaction_id": "pay_O1k892Jk881a",
+        "payment_method": "UPI",
+        "status": "CAPTURED",
+        "amount": 149900.00
+      },
+      "logistics": {
+        "carrier": "EKART",
+        "tracking_number": "EKRT987654321IN",
+        "current_status": "OUT_FOR_DELIVERY",
+        "sla_delivery_date": "2026-08-26T18:00:00Z"
+      },
+      "financials": {
+        "subtotal": 149900.00,
+        "tax_amount": 22866.10,
+        "shipping_fee": 0.00,
+        "discount_amount": 0.00,
+        "supercoins_earned": 100,
+        "grand_total": 149900.00
+      }
+    },
+    {
+      "order_number": "HK-20260825-88B2",
+      "customer_email": "priya.patel@example.com",
+      "customer_name": "Priya Patel",
+      "shipping_address": {
+        "full_name": "Priya Patel",
+        "phone_number": "9876543211",
+        "address_line1": "Flat 402, Sea Green Apartments, Bandra West",
+        "city": "Mumbai",
+        "state": "Maharashtra",
+        "postal_code": "400050",
+        "country": "India"
+      },
+      "items": [
+        {
+          "product_id": 2,
+          "product_name": "Sony WH-1000XM5 Wireless Headphones",
+          "sku": "SNY-XM5-BLK",
+          "quantity": 1,
+          "unit_price": 26990.00,
+          "total_price": 26990.00,
+          "seller_id": 2,
+          "seller_name": "Sony Audio World"
+        }
+      ],
+      "payment": {
+        "gateway": "PAYU",
+        "transaction_id": "payu_9921Ka81",
+        "payment_method": "CREDIT_CARD_HDFC",
+        "status": "CAPTURED",
+        "amount": 24990.00
+      },
+      "logistics": {
+        "carrier": "DELHIVERY",
+        "tracking_number": "DLHV554433221IN",
+        "current_status": "DELIVERED",
+        "sla_delivery_date": "2026-08-25T14:30:00Z"
+      },
+      "financials": {
+        "subtotal": 26990.00,
+        "tax_amount": 4117.12,
+        "shipping_fee": 0.00,
+        "discount_amount": 2000.00,
+        "supercoins_earned": 50,
+        "grand_total": 24990.00
+      }
+    }
+  ]
+}

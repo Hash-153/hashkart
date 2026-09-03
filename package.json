@@ -1,0 +1,27 @@
+{
+  "name": "novamart-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "NovaMart Enterprise Indian E-Commerce Marketplace Platform",
+  "scripts": {
+    "dev": "npm run dev --prefix frontend",
+    "build": "npm run build --prefix frontend",
+    "test": "npm run test --prefix frontend",
+    "start": "python app.py",
+    "backend:dev": "python -m uvicorn app.main:app --reload --app-dir backend",
+    "backend:test": "pytest --app-dir backend backend/tests"
+  },
+  "keywords": [
+    "ecommerce",
+    "marketplace",
+    "flipkart-clone",
+    "react",
+    "fastapi",
+    "typescript",
+    "python"
+  ],
+  "author": "Hash-153",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
